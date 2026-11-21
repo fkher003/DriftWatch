@@ -1,0 +1,51 @@
+x-runtime: &runtime
+  build: .
+  environment:
+    DATABASE_URL: postgresql://drift:drift@db:5432/driftwatch
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: driftwatch
+      POSTGRES_USER: drift
+      POSTGRES_PASSWORD: drift
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U drift -d driftwatch"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  migrate:
+    <<: *runtime
+    command: ["npm","run","db:migrate"]
+    depends_on:
+      db:
+        condition: service_healthy
+  app:
+    <<: *runtime
+    environment:
+      DATABASE_URL: postgresql://drift:drift@db:5432/driftwatch
+      OPERATOR_TOKEN: ${OPERATOR_TOKEN:-}
+    ports: ["127.0.0.1:3000:3000"]
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+  seed:
+    <<: *runtime
+    command: ["npm","run","db:seed"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+  verify:
+    <<: *runtime
+    build:
+      context: .
+      target: verify
+    profiles: ["test"]
+    command: ["npm","run","verify-e2e"]
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  pgdata:

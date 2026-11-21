@@ -1,0 +1,17 @@
+name: Optional demo health ping
+on:
+  workflow_dispatch:
+  # To opt in, set the repository variables described in README and uncomment both lines.
+  # schedule:
+  #   - cron: "*/14 * * * *"
+permissions: {}
+jobs:
+  ping:
+    if: vars.ENABLE_KEEP_ALIVE == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Check API readiness
+        env:
+          HEALTH_URL: ${{ vars.DRIFTWATCH_HEALTH_URL }}
+        run: curl --proto '=https' --fail --silent --show-error --max-time 75 --output /dev/null -- "$HEALTH_URL"

@@ -1,0 +1,31 @@
+name: foundation
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: driftwatch
+          POSTGRES_USER: drift
+          POSTGRES_PASSWORD: drift
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U drift -d driftwatch"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://drift:drift@localhost:5432/driftwatch
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck && npm run db:check && npm test
+      - run: npm run db:migrate && npm run db:migrate
+      - run: npm run verify-e2e
+      - run: npx playwright-core install --with-deps chromium
+      - run: npm run test:browser
+      - run: docker build -t driftwatch .

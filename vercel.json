@@ -1,0 +1,12 @@
+{
+  "$schema":"https://openapi.vercel.sh/vercel.json",
+  "installCommand":"npm ci",
+  "buildCommand":"npm run build",
+  "outputDirectory":"apps/web/dist",
+  "framework":null,
+  "rewrites":[
+    {"source":"/api/:path*","destination":"https://replace-with-render-host.invalid/api/:path*"},
+    {"source":"/sandbox/:path*","destination":"https://replace-with-render-host.invalid/sandbox/:path*"},
+    {"source":"/health","destination":"https://replace-with-render-host.invalid/health"}
+  ]
+}

@@ -1,0 +1,27 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { PGlite } from "@electric-sql/pglite";
+test("initial schema supports leased jobs, time windows and one open incident per fingerprint", async t => {
+  const db = new PGlite();
+  t.after(() => db.close());
+  const sql = path => readFile("db/" + path, "utf8");
+  await db.exec(await sql("migrations/001_foundation.sql"));
+  await db.exec(await sql("migrations/002_engine.sql"));
+  await db.exec(await sql("migrations/003_dashboard.sql"));
+  const id = (await db.query("INSERT INTO monitors(name,sandbox_fault,expected_schema,interval_ms,latency_sla_ms) VALUES ('Checkout','healthy','{}',2000,300) RETURNING id")).rows[0].id;
+  await db.query("INSERT INTO probe_jobs(monitor_id) VALUES ($1)",[id]);
+  const claim = await sql("queries/claim.sql");
+  assert.equal((await db.query(claim,[1,30000])).rows.length,1);
+  assert.equal((await db.query(claim,[1,30000])).rows.length,0);
+  const latency = await sql("queries/latency.sql");
+  const window = [id,"2025-01-01","2025-01-02"];
+  assert.deepEqual((await db.query(latency,window)).rows[0],{p50:null,p95:null,p99:null});
+  await db.query("INSERT INTO probe_results(monitor_id,lease_token,observed_at,latency_ms) SELECT $1,gen_random_uuid(),'2025-01-01',ms FROM generate_series(0,100) ms",[id]);
+  assert.deepEqual((await db.query(latency,window)).rows[0],{p50:50,p95:95,p99:99});
+  const open = "INSERT INTO incidents(monitor_id,kind,fingerprint,status) VALUES ($1,'drift','/items:type','OPEN')";
+  await db.query(open,[id]);
+  await assert.rejects(db.query(open,[id]),{code:"23505"});
+  await db.query("UPDATE incidents SET status='RESOLVED',resolved_at=now() WHERE monitor_id=$1",[id]);
+  await db.query(open,[id]);
+});

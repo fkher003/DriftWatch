@@ -1,0 +1,35 @@
+{
+  "name": "driftwatch",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": "22.12.0 || >=22.13.0"
+  },
+  "scripts": {
+    "build": "tsc -b && vite build apps/web",
+    "typecheck": "tsc -b --force",
+    "test": "npm run build && node --test tests/*.test.mjs && npm test -w @driftwatch/web",
+    "start": "node apps/server/dist/main.js",
+    "dev:web": "vite apps/web",
+    "db:generate": "node scripts/migration.mjs generate",
+    "db:check": "node scripts/migration.mjs check",
+    "db:migrate": "node scripts/migration.mjs apply",
+    "db:seed": "node scripts/seed.mjs",
+    "test:unit": "tsc -b && node --test tests/engine.test.mjs",
+    "test:integration": "node --test integration/postgres.test.mjs",
+    "verify-e2e": "node --test integration/postgres.test.mjs integration/runtime.test.mjs integration/hardening.test.mjs",
+    "test:browser": "node --test integration/browser.test.mjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.3.14",
+    "@types/node": "^22.0.0",
+    "playwright-core": "^1.65.1",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.0"
+  }
+}
