@@ -2,7 +2,7 @@
 
 **Catch a deployed API changing under its clients.** Flip a fault in a private checkout sandbox and follow one real request from login to orders, through a JSON contract diff, to a deduplicated incident and its alert delivery.
 
-**[Live Demo URL]** · Pending public deployment. **[20-Second Demo GIF](docs/media/driftwatch-demo.gif)** · Recorded from the local Docker stack.
+**[Live Demo](https://drift-watch-two.vercel.app)** · Hosted on Vercel Hobby + Render Free + Neon Free (first load after 15 min idle includes a Render cold start). **[20-Second Demo GIF](docs/media/driftwatch-demo.gif)** · Recorded from the local Docker stack.
 
 ![An orders response changes an integer into a string. Two failed checks share one incident. Recovery closes it, and a latency spike crosses the SLA.](docs/media/driftwatch-demo.gif)
 

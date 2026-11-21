@@ -45,9 +45,9 @@ alert_deliveries is the durable local alert sink. OPENED and RESOLVED each have 
 - [x] Run headless browser checks against real fixtures and DB. Verify downloaded JS syntax, clipboard shell syntax, page errors and console errors.
 - [x] Ship production Docker and Compose, Render Blueprint, Vercel rewrites, opt-in health-ping workflow and a 20-second recording from the actual Compose stack. See README for commands, environment variables and hosting limits.
 
-Final local gate: clean install, strict typecheck, migration check and Vite build passed. The workspace reported 9 backend smoke/SQL checks and 7 frontend Vitest checks. Linux Compose with PostgreSQL 16 passed all 26 integration/E2E checks, including both real POSIX signals. On Windows the same suite passed 24 with the two POSIX cases skipped. Edge passed the browser suite. A fresh database also passed a production-image smoke test using the exact Render startup command, including workspace import, Secure demo cookie and allowed origin. Public cloud deployment is pending.
+Final local gate: clean install, strict typecheck, migration check and Vite build passed. The workspace reported 9 backend smoke/SQL checks and 7 frontend Vitest checks. Linux Compose with PostgreSQL 16 passed all 26 integration/E2E checks, including both real POSIX signals. On Windows the same suite passed 24 with the two POSIX cases skipped. Edge passed the browser suite. A fresh database also passed a production-image smoke test using the exact Render startup command, including workspace import, Secure demo cookie and allowed origin. Public cloud deployment is live at https://drift-watch-two.vercel.app (Vercel Hobby -> Render Free `driftwatch-api-v601.onrender.com` -> Neon Free PostgreSQL 16).
 
 ## Remaining
 
-- [ ] Publish to the chosen host and repeat the browser checklist using its public HTTPS URL.
+- [x] Publish to the chosen host and repeat the browser checklist using its public HTTPS URL (`https://drift-watch-two.vercel.app`: `/health` 200 `database=connected`, `LIVE · SSE`, `$.orders[0].quantity` `"3"` vs integer, deduplicated `failure_count` + 1 `OPENED`, recovery 1 `RESOLVED`, incognito workspace isolation verified, 0 console/HTTP errors).
 - [ ] Add an external delivery adapter if email or webhook notifications are required. Use incident ID and transition as the provider idempotency key.
