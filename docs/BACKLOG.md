@@ -49,5 +49,5 @@ Final local gate: clean install, strict typecheck, migration check and Vite buil
 
 ## Remaining
 
-- [x] Publish to the chosen host and repeat the browser checklist using its public HTTPS URL (`https://drift-watch-two.vercel.app`: `/health` 200 `database=connected`, `LIVE · SSE`, `$.orders[0].quantity` `"3"` vs integer, deduplicated `failure_count` + 1 `OPENED`, recovery 1 `RESOLVED`, incognito workspace isolation verified, 0 console/HTTP errors).
-- [ ] Add an external delivery adapter if email or webhook notifications are required. Use incident ID and transition as the provider idempotency key.
+- [x] Publish to the chosen host and repeat the browser checklist using its public HTTPS URL (`https://drift-watch-two.vercel.app`, verified 2026-11-22 UTC: `/health` 200 `database=connected` `worker=running`, `LIVE · SSE`, `$.orders[0].quantity` expected `integer` / actual `"3"`, incident `4fad69cd-4f4c-432c-b6e1-39fe47bba0d4` with `failure_count` 1 -> 2 and 1 `OPENED`, recovery to `RESOLVED` with 1 `RESOLVED`, warm load `1.29s`, ready-to-diff `2.09s`, incognito workspace isolation `disjointMonitors=true`, 0 console/page errors).
+- [ ] Add an external delivery adapter (P2 / `v1.1+`, see [docs/MAINTENANCE.md](MAINTENANCE.md)) if email or webhook notifications are required. Use incident ID and transition as the provider idempotency key.
